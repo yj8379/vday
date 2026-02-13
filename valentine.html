@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine? 💕</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:wght@400;700&family=Sacramento&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --rose: #ff69b4;
+            --deep-rose: #ff1493;
+            --blush: #ffb6c1;
+            --cream: #fff5f7;
+            --burgundy: #8b0045;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe0ec 50%, #ffd4e5 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Coupon Entry Screen */
+        .coupon-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #ffb6c1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .coupon-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .coupon-box {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.8s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .coupon-box h1 {
+            font-family: 'Sacramento', cursive;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            color: var(--deep-rose);
+            margin-bottom: 15px;
+        }
+
+        .coupon-box .gift-emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: rotate 2s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            0%, 100% {
+                transform: rotate(-10deg);
+            }
+            50% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .coupon-box p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .question-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .question-group label {
+            display: block;
+            font-size: 1rem;
+            color: var(--burgundy);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .question-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--blush);
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            transition: all 0.3s ease;
+            background: #fff5f7;
+        }
+
+        .question-group input:focus {
+            outline: none;
+            border-color: var(--deep-rose);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        }
+
+        .unlock-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--deep-rose) 0%, var(--rose) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .unlock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            display: none;
+            animation: shake 0.5s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Floating hearts background */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .carousel-slide video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.3;
+            animation: float-up 8s infinite ease-in;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Title */
+        .title {
+            font-family: 'Sacramento', cursive;
+            font-size: clamp(3rem, 8vw, 6rem);
+            text-align: center;
+            color: var(--deep-rose);
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Carousel */
+        .carousel-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 50px;
+            background: white;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+            border: 3px solid var(--blush);
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd6e7 0%, #ffebf4 100%);
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        .placeholder-text {
+            font-family: 'Pacifico', cursive;
+            font-size: 2rem;
+            color: var(--rose);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--blush);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--deep-rose);
+            transform: scale(1.3);
+        }
+
+        /* Question */
+        .question {
+            text-align: center;
+            margin: 50px 0 40px;
+        }
+
+        .question h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--burgundy);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .question p {
+            font-size: 1.2rem;
+            color: var(--deep-rose);
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-top: 40px;
+            min-height: 150px;
+            position: relative;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, var(--deep-rose) 0%, var(--rose) 100%);
+            color: white;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
+            color: #666;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .btn-no:hover {
+            transform: scale(1.05);
+        }
+
+        /* Celebration overlay */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 20, 147, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .celebration.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .celebration-content {
+            text-align: center;
+            color: white;
+            animation: bounceIn 0.8s ease;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .celebration-content h1 {
+            font-family: 'Sacramento', cursive;
+            font-size: clamp(3rem, 10vw, 7rem);
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .celebration-content p {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 20px;
+        }
+
+        .celebration-hearts {
+            font-size: 3rem;
+            animation: heartBeat 1s ease infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            10%, 30% {
+                transform: scale(1.2);
+            }
+            20%, 40% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: white;
+            position: absolute;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .carousel {
+                height: 300px;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .btn {
+                padding: 15px 40px;
+                font-size: 1.2rem;
+            }
+
+            .btn-no {
+                position: relative;
+            }
+
+            .coupon-box {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Coupon Entry Screen -->
+    <div class="coupon-screen" id="couponScreen">
+        <div class="coupon-box">
+            <div class="gift-emoji">🎁</div>
+            <h1>Special Gift Awaits!</h1>
+            <p>Answer these questions to unlock your Valentine's surprise</p>
+            
+            <form id="couponForm">
+                <div class="question-group">
+                    <label for="question1">How do you know your boyfriend?</label>
+                    <input type="text" id="question1" placeholder="Enter your answer..." required>
+                </div>
+                
+                <div class="question-group">
+                    <label for="question2">What name does he call you?</label>
+                    <input type="text" id="question2" placeholder="Enter your answer..." required>
+                </div>
+                
+                <button type="submit" class="unlock-btn">Unlock My Gift 💝</button>
+                <div class="error-message" id="errorMessage">
+                    Oops! Those answers don't match. Try again! 💕
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating hearts background -->
+    <div class="hearts-bg" id="heartsContainer"></div>
+
+    <!-- Celebration overlay -->
+    <div class="celebration" id="celebration">
+        <div class="celebration-content">
+            <h1>Yay! 💕</h1>
+            <p>I knew you'd say yes! Big puchizz 😘</p>
+            <div class="celebration-hearts">💖 💝 💗 💓 💞</div>
+            <p style="margin-top: 30px; font-size: 1.2rem;">I love you the most RABISHHHHH! </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="title">Will You Be My Valentine Rabishhh?</h1>
+
+        <!-- Carousel -->
+        <div class="carousel-container">
+            <div class="carousel" id="carousel">
+                <div class="carousel-slide active">
+                    <img src="assets/p1.jpg" alt="Memory 1">
+                </div>
+                  
+                <!-- Video slide -->
+                <div class="carousel-slide">
+                    <video src="assets/v1.mp4" muted loop playsinline></video>
+                </div>
+          
+                <!-- Image slide -->
+                <div class="carousel-slide">
+                    <img src="assets/p2.jpg" alt="Memory 2" />
+                </div>
+          
+                <!-- Video slide -->
+                <div class="carousel-slide">
+                    <img src="assets/p3.jpg" alt="Memory 3" />
+                </div>
+            </div>
+          
+            <div class="carousel-dots" id="carouselDots">
+                <span class="dot active" data-slide="0"></span>
+                <span class="dot" data-slide="1"></span>
+                <span class="dot" data-slide="2"></span>
+                <span class="dot" data-slide="3"></span>
+            </div>
+        </div>
+
+        <!-- Question -->
+        <div class="question">
+            <h2>Will You Be My Valentine?</h2>
+            <p>There's only one right answer... 💝</p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons-container">
+            <button class="btn btn-yes" id="yesBtn">Yes! 💕</button>
+            <button class="btn btn-no" id="noBtn">No</button>
+        </div>
+    </div>
+
+    <script>
+        // Coupon validation
+        const couponForm = document.getElementById('couponForm');
+        const couponScreen = document.getElementById('couponScreen');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // CHANGE THESE ANSWERS TO YOUR CORRECT ANSWERS
+        const correctAnswers = {
+            question1: "Chuhi", 
+            question2: "rabishhh"   
+        };
+
+        couponForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const answer1 = document.getElementById('question1').value.trim().toLowerCase();
+            const answer2 = document.getElementById('question2').value.trim().toLowerCase();
+            
+            if (answer1 === correctAnswers.question1.toLowerCase() && 
+                answer2 === correctAnswers.question2.toLowerCase()) {
+                // Correct answers - hide coupon screen
+                couponScreen.classList.add('hidden');
+                // Start the main site animations
+                startMainSite();
+            } else {
+                // Wrong answers - show error
+                errorMessage.classList.add('show');
+                setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        function startMainSite() {
+            // Start floating hearts
+            setInterval(createFloatingHeart, 500);
+            // Start carousel
+            setInterval(nextSlide, 3000);
+        }
+
+        // Floating hearts background
+        const heartsContainer = document.getElementById('heartsContainer');
+        const heartSymbols = ['💕', '💖', '💗', '💝', '💓', '💞', '💘', '❤️', '🌹'];
+        
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-float';
+            heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 5 + 's';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heartsContainer.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 8000);
+        }
+
+        // Carousel functionality
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+
+                const video = slide.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.currentTime = 0;
+                }
+            });
+
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+
+            const activeVideo = slides[currentSlide].querySelector('video');
+            if (activeVideo) {
+                activeVideo.play().catch(() => {
+                    console.log('Autoplay blocked');
+                });
+            }
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        // Dot navigation
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                showSlide(parseInt(dot.getAttribute('data-slide')));
+            });
+        });
+
+        // Button functionality
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const celebration = document.getElementById('celebration');
+
+        yesBtn.addEventListener('click', () => {
+            celebration.classList.add('show');
+            createConfetti();
+        });
+
+        // Moving "No" button
+        noBtn.addEventListener('mouseenter', moveButton);
+        noBtn.addEventListener('click', moveButton);
+
+        function moveButton() {
+            const container = document.querySelector('.buttons-container');
+            const containerRect = container.getBoundingClientRect();
+            const buttonRect = noBtn.getBoundingClientRect();
+
+            const maxX = containerRect.width - buttonRect.width;
+            const maxY = containerRect.height - buttonRect.height;
+
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // Confetti effect
+        function createConfetti() {
+            const colors = ['#ff69b4', '#ff1493', '#ffb6c1', '#fff', '#ffd700'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = -10 + 'px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 30);
+            }
+        }
+    </script>
+</body>
+</html>
